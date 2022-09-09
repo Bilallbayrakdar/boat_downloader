@@ -119,9 +119,10 @@ def convert2gt(x):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
+
     parser.add_argument("--download", type=int, default=0, help="Download the dataset.")
     parser.add_argument("--path_in", type=str, default="./images", help="Path to the input dataset.")
-    parser.add_argument("--path_out", type=str, default="./data", help="Path to the output dataset.")
+    parser.add_argument("--path_out", type=str, default="./datasets/boats", help="Path to the output dataset.")
 
     args = parser.parse_args()
 
@@ -146,40 +147,44 @@ if __name__ == "__main__":
     ## Convert the data to the format to ICDAR and save it
 
     if not os.path.exists(dst): os.mkdir(dst)
-    if not os.path.exists(f"{dst}/train"): os.mkdir(f"{dst}/train")
-    if not os.path.exists(f"{dst}/train/img"): os.mkdir(f"{dst}/train/img")
-    if not os.path.exists(f"{dst}/train/gt"): os.mkdir(f"{dst}/train/gt")
+    # if not os.path.exists(f"{dst}/train"): os.mkdir(f"{dst}/train")
+    if not os.path.exists(f"{dst}/train_images"): os.mkdir(f"{dst}/train_images")
+    if not os.path.exists(f"{dst}/train_gts"): os.mkdir(f"{dst}/train_gts")
     train_txt = ""
 
     for i in train:
         image = images[i]
         print(image)
-        shutil.copyfile(f"{image}", f"{dst}/train/img/{i}.jpg")
-        with open(f"{dst}/train/gt/{i}.txt", "w+") as f: 
+        # shutil.copyfile(f"{image}", f"{dst}/train/img/{i}.jpg")
+        shutil.copyfile(f"{image}", f"{dst}/train_images/{i}.jpg")
+        # with open(f"{dst}/train/gt/{i}.txt", "w+") as f: 
+        with open(f"{dst}/train_gts/{i}.txt", "w+") as f: 
             f.write(convert2gt(labellings[image.split("/")[-1]]))
 
-        train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
+        # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
+        train_txt += f"{i}.jpg\t{i}.txt\n"
 
-    with open(f"{dst}/train.txt", "w+") as f: f.write(train_txt)
+    with open(f"{dst}/train_list.txt", "w+") as f: f.write(train_txt)
 
     if not os.path.exists(dst): os.mkdir(dst)
-    if not os.path.exists(f"{dst}/test"): os.mkdir(f"{dst}/test")
-    if not os.path.exists(f"{dst}/test/img"): os.mkdir(f"{dst}/test/img")
-    if not os.path.exists(f"{dst}/test/gt"): os.mkdir(f"{dst}/test/gt")
+    # if not os.path.exists(f"{dst}/test"): os.mkdir(f"{dst}/test")
+    # if not os.path.exists(f"{dst}/test/img"): os.mkdir(f"{dst}/test/img")
+    if not os.path.exists(f"{dst}/test_images"): os.mkdir(f"{dst}/test_images")
+    # if not os.path.exists(f"{dst}/test/gt"): os.mkdir(f"{dst}/test/gt")
+    if not os.path.exists(f"{dst}/test_gts"): os.mkdir(f"{dst}/test_gts")
 
     test_txt = ""
 
     for i in test:
         image = images[i]
         print(image)
-        shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
-        with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
+        # shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
+        shutil.copyfile(f"{image}", f"{dst}/test_images/{i}.jpg")
+        # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
+        with open(f"{dst}/test_gts/{i}.txt", "w+") as f: 
             f.write(convert2gt(labellings[image.split("/")[-1]]))
 
-        test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
+        # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
+        test_txt += f"{i}.jpg\t{i}.txt\n"
 
-    with open(f"{dst}/test.txt", "w+") as f: f.write(train_txt)
-
-
-
-
+    with open(f"{dst}/test_list.txt", "w+") as f: f.write(train_txt)
