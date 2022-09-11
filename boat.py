@@ -158,11 +158,11 @@ if __name__ == "__main__":
         # shutil.copyfile(f"{image}", f"{dst}/train/img/{i}.jpg")
         shutil.copyfile(f"{image}", f"{dst}/train_images/{i}.jpg")
         # with open(f"{dst}/train/gt/{i}.txt", "w+") as f: 
-        with open(f"{dst}/train_gts/{i}.txt", "w+") as f: 
+        with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f: 
             f.write(convert2gt(labellings[image.split("/")[-1]]))
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
-        train_txt += f"{i}.jpg\t{i}.txt\n"
+        train_txt += f"{i}.jpg\tgt_{i}.txt\n"
 
     with open(f"{dst}/train_list.txt", "w+") as f: f.write(train_txt)
 
@@ -181,10 +181,10 @@ if __name__ == "__main__":
         # shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
         shutil.copyfile(f"{image}", f"{dst}/test_images/{i}.jpg")
         # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
-        with open(f"{dst}/test_gts/{i}.txt", "w+") as f: 
+        with open(f"{dst}/test_gts/{i}gt_.txt", "w+") as f: 
             f.write(convert2gt(labellings[image.split("/")[-1]]))
 
         # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
-        test_txt += f"{i}.jpg\t{i}.txt\n"
+        test_txt += f"{i}.jpg\tgt_{i}.txt\n"
 
     with open(f"{dst}/test_list.txt", "w+") as f: f.write(train_txt)
