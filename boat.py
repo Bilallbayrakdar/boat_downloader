@@ -93,10 +93,19 @@ def build_data(path:str, batch_size:int=8, verbose:bool=False):
                 empty = [x for x in temp["regions"] if x['shape_attributes'].get('all_points_x',[]) != []]
                     
                 if len(empty) == len(temp['regions']):
-                    temp = {x['region_attributes'].get('boat_name', x['region_attributes'].get('other_text', '')):np.stack((x['shape_attributes']['all_points_x'],x['shape_attributes']['all_points_y']), axis=-1) for x in temp["regions"]}
-                    # temp = {asciify(k.lower()):convert_rectangle(v) for k,v in temp.items() if k != ''}
-                    temp = {asciify(k.lower()):v.reshape(-1).tolist() for k,v in temp.items() if k != ''}
+                    temp = [[x['region_attributes'].get('boat_name', x['region_attributes'].get('other_text', '')),np.stack((x['shape_attributes']['all_points_x'],x['shape_attributes']['all_points_y']), axis=-1)] for x in temp["regions"]]
+                    temp = [[asciify(k.lower()),convert_rectangle(v)] for k,v in temp]
                     gt_labels_bboxes[name] = temp
+
+
+                # k = [e for e in list(labellings[labelling]['labels']['_via_img_metadata'].keys()) if name in e][0]
+                # temp = labellings[labelling]['labels']['_via_img_metadata'][k]
+                # empty = [x for x in temp["regions"] if x['shape_attributes'].get('all_points_x',[]) != []]
+                    
+                # if len(empty) == len(temp['regions']):
+                #     temp = {x['region_attributes'].get('boat_name', x['region_attributes'].get('other_text', '')):np.stack((x['shape_attributes']['all_points_x'],x['shape_attributes']['all_points_y']), axis=-1) for x in temp["regions"]}
+                #     temp = {asciify(k.lower()):v.reshape(-1).tolist() for k,v in temp.items() if k != ''}
+                #     gt_labels_bboxes[name] = temp
                         
                 else:
                     print(f"Empty image: {name}")
@@ -109,19 +118,23 @@ def build_data(path:str, batch_size:int=8, verbose:bool=False):
     return gt
 
 def convert2gt(x):
+    # print("convert2gt")
+    # print(f"x: {x}")
     if x == {}: return ""
 
-    v = list(x.items())
+    # v = list(x.items())
+    v= x
     labels = []
     values = []
     gt = ""
 
-    for k,v in v:
-        v = str(v).replace("[","").replace("]","")
-        gt += f"{v}, {k}\n"
-
-    return gt
-
+    if v: 
+        for k,v in v:
+            v = str(v).replace("[","").replace("]","")
+            if k == '': k = "###"
+            gt += f"{v}, {k}\n"
+        return gt
+    else: return ''
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -142,8 +155,7 @@ if __name__ == "__main__":
 
     labellings = build_data(src)
     folders = [entity for entity in os.listdir(src)]
-
-    images = [f"{src}/{folder}/{name}" for folder in folders for name in os.listdir(f"{src}/{folder}") if name.endswith(".jpg")]
+    images = [f"{src}/{folder}/{name}" for folder in folders for name in os.listdir(f"{src}/{folder}") if (name.endswith(".jpg") and name in list(labellings.keys()))]
 
     rng = default_rng()
     train = rng.choice(len(images), size=int(len(images)*.8), replace=False)
@@ -164,10 +176,12 @@ if __name__ == "__main__":
         # shutil.copyfile(f"{image}", f"{dst}/train/img/{i}.jpg")
         shutil.copyfile(f"{image}", f"{dst}/train_images/{i}.jpg")
         # with open(f"{dst}/train/gt/{i}.txt", "w+") as f: 
-        
-        with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f: 
-            try: f.write(convert2gt(labellings[image.split("/")[-1]]))
-            except: pass
+        # print(image.split("/")[-1])
+
+        with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f:
+            f.write(convert2gt(labellings[image.split("/")[-1]]))
+            # try: f.write(convert2gt(labellings[image.split("/")[-1]]))
+            # except: pass
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
         # train_txt += f"{i}.jpg\tgt_{i}.txt\n"
