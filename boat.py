@@ -68,10 +68,14 @@ def build_data(path:str, batch_size:int=8, verbose:bool=False):
     gt = {}
 
     for labelling in labellings:
-        print(f"labelling:{labelling}")
-        labellings[labelling]["image_names"] = [image for image in os.listdir(labelling) if image.endswith('.jpg')]
-        labellings[labelling]["labels"] = [json_load(open(f"{labelling}/{label}")) for label in os.listdir(labelling) if label.endswith('.json') and not label.endswith('json.json')][0]
-        
+        try:
+            print(f"labelling:{labelling}")
+            labellings[labelling]["image_names"] = [image for image in os.listdir(labelling) if image.endswith('.jpg')]
+            labellings[labelling]["labels"] = [json_load(open(f"{labelling}/{label}")) for label in os.listdir(labelling) if label.endswith('.json') and not label.endswith('json.json')][0]
+        except:
+            print(f"There is no json file in {labelling}")
+            del labellings[labelling]
+
     print("Iterating over folders...")
     for labelling in labellings:
         empty_images = []
@@ -162,7 +166,8 @@ if __name__ == "__main__":
             f.write(convert2gt(labellings[image.split("/")[-1]]))
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
-        train_txt += f"{i}.jpg\tgt_{i}.txt\n"
+        # train_txt += f"{i}.jpg\tgt_{i}.txt\n"
+        train_txt += f"{i}\n"
 
     with open(f"{dst}/train_list.txt", "w+") as f: f.write(train_txt)
 
@@ -181,10 +186,10 @@ if __name__ == "__main__":
         # shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
         shutil.copyfile(f"{image}", f"{dst}/test_images/{i}.jpg")
         # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
-        with open(f"{dst}/test_gts/{i}gt_.txt", "w+") as f: 
+        with open(f"{dst}/test_gts/gt_{i}.txt", "w+") as f: 
             f.write(convert2gt(labellings[image.split("/")[-1]]))
 
         # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
-        test_txt += f"{i}.jpg\tgt_{i}.txt\n"
+        test_txt += f"{i}\n"
 
-    with open(f"{dst}/test_list.txt", "w+") as f: f.write(train_txt)
+    with open(f"{dst}/test_list.txt", "w+") as f: f.write(test_txt)
