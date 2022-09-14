@@ -66,7 +66,7 @@ def build_data(path:str, batch_size:int=8, verbose:bool=False):
     labellings = {f"{path}/{folder}":{} for folder in os.listdir(f"{path}/") if not (folder.startswith('.') or folder.endswith(".zip") or folder.endswith("out"))}
 
     gt = {}
-
+    del_list = []
     for labelling in labellings:
         try:
             print(f"labelling:{labelling}")
@@ -74,12 +74,14 @@ def build_data(path:str, batch_size:int=8, verbose:bool=False):
             labellings[labelling]["labels"] = [json_load(open(f"{labelling}/{label}")) for label in os.listdir(labelling) if label.endswith('.json') and not label.endswith('json.json')][0]
         except:
             print(f"There is no json file in {labelling}")
-            del labellings[labelling]
+            del_list.append(labelling) 
+
+    for ele in del_list: del labellings[ele];
 
     print("Iterating over folders...")
     for labelling in labellings:
         empty_images = []
-        print(f"{labelling}")
+        print(f"folder: {labelling}")
         gt_labels_bboxes = {}
         for i in range(0,ceil(len(labellings[labelling]["image_names"])/batch_size)):
             b_idx = i*batch_size
@@ -158,12 +160,14 @@ if __name__ == "__main__":
 
     for i in train:
         image = images[i]
-        print(image)
+        # print(image)
         # shutil.copyfile(f"{image}", f"{dst}/train/img/{i}.jpg")
         shutil.copyfile(f"{image}", f"{dst}/train_images/{i}.jpg")
         # with open(f"{dst}/train/gt/{i}.txt", "w+") as f: 
+        
         with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f: 
-            f.write(convert2gt(labellings[image.split("/")[-1]]))
+            try: f.write(convert2gt(labellings[image.split("/")[-1]]))
+            except: pass
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
         # train_txt += f"{i}.jpg\tgt_{i}.txt\n"
@@ -182,14 +186,15 @@ if __name__ == "__main__":
 
     for i in test:
         image = images[i]
-        print(image)
+        # print(image)
         # shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
         shutil.copyfile(f"{image}", f"{dst}/test_images/{i}.jpg")
         # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
         with open(f"{dst}/test_gts/gt_{i}.txt", "w+") as f: 
-            f.write(convert2gt(labellings[image.split("/")[-1]]))
-
+            try: f.write(convert2gt(labellings[image.split("/")[-1]]))
+            except: pass
         # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
         test_txt += f"{i}\n"
 
     with open(f"{dst}/test_list.txt", "w+") as f: f.write(test_txt)
+    print(f"Train Size:{len(train)} | Test Size: {len(test)}")
