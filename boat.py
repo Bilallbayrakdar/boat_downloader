@@ -183,12 +183,12 @@ if __name__ == "__main__":
             if txt != False: 
                 with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f:
                     f.write(txt)
+                train_txt += f"{i}\n"
             # try: f.write(convert2gt(labellings[image.split("/")[-1]]))
         except: pass
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
         # train_txt += f"{i}.jpg\tgt_{i}.txt\n"
-        train_txt += f"{i}\n"
 
     with open(f"{dst}/train_list.txt", "w+") as f: f.write(train_txt)
 
@@ -212,9 +212,9 @@ if __name__ == "__main__":
             if txt != False:
                 with open(f"{dst}/test_gts/gt_{i}.txt", "w+") as f: 
                     f.write(txt)
+                test_txt += f"{i}\n"
         except: pass
         # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
-        test_txt += f"{i}\n"
 
     with open(f"{dst}/test_list.txt", "w+") as f: f.write(test_txt)
     print(f"Train Size:{len(train)} | Test Size: {len(test)}")
