@@ -134,7 +134,7 @@ def convert2gt(x):
             if k == '': k = "###"
             gt += f"{v}, {k}\n"
         return gt
-    else: return ''
+    else: return ""
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -179,9 +179,11 @@ if __name__ == "__main__":
         # print(image.split("/")[-1])
 
         with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f:
-            f.write(convert2gt(labellings[image.split("/")[-1]]))
+            try:
+                txt = convert2gt(labellings[image.split("/")[-1]])
+                if len(txt): f.write(txt)
             # try: f.write(convert2gt(labellings[image.split("/")[-1]]))
-            # except: pass
+            except: pass
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
         # train_txt += f"{i}.jpg\tgt_{i}.txt\n"
@@ -205,7 +207,9 @@ if __name__ == "__main__":
         shutil.copyfile(f"{image}", f"{dst}/test_images/{i}.jpg")
         # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
         with open(f"{dst}/test_gts/gt_{i}.txt", "w+") as f: 
-            try: f.write(convert2gt(labellings[image.split("/")[-1]]))
+            try: 
+                txt = convert2gt(labellings[image.split("/")[-1]])
+                if len(txt)>0: f.write(txt)
             except: pass
         # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
         test_txt += f"{i}\n"
