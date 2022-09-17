@@ -38,7 +38,8 @@ def convert_rectangle(bbox):
 
     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
 
-    return [x1, y1, x2, y2, x1, y2, x2, y1]
+    # return [x1, y1, x2, y2, x1, y2, x2, y1]
+    return [x1, y1, x2, y1, x2, y2, x1, y2]
 
 
 def asciify(string): return string.replace('ğ','g').replace('ı','i').replace('ö','o').replace('ü','u').replace('ş','s').replace('ç','c')
@@ -133,7 +134,7 @@ def convert2gt(x):
             v = str(v).replace("[","").replace("]","")
             if k == '': k = "###"
             gt += f"{v}, {k}\n"
-        return gt
+        return gt.replace(' ', '')
     else: return False
 
 if __name__ == "__main__":
@@ -165,56 +166,67 @@ if __name__ == "__main__":
     ## Convert the data to the format to ICDAR and save it
 
     if not os.path.exists(dst): os.mkdir(dst)
-    # if not os.path.exists(f"{dst}/train"): os.mkdir(f"{dst}/train")
-    if not os.path.exists(f"{dst}/train_images"): os.mkdir(f"{dst}/train_images")
-    if not os.path.exists(f"{dst}/train_gts"): os.mkdir(f"{dst}/train_gts")
+    if not os.path.exists(f"{dst}/annotations"): os.mkdir(f"{dst}/annotations")
+    if not os.path.exists(f"{dst}/imgs"): os.mkdir(f"{dst}/imgs")
+    if not os.path.exists(f"{dst}/annotations/training"): os.mkdir(f"{dst}/annotations/training")
+    if not os.path.exists(f"{dst}/imgs/training"): os.mkdir(f"{dst}/imgs/training")
+
+    # if not os.path.exists(f"{dst}/training"): os.mkdir(f"{dst}/training")
+    # if not os.path.exists(f"{dst}/train_images"): os.mkdir(f"{dst}/train_images")
+    # if not os.path.exists(f"{dst}/train_gts"): os.mkdir(f"{dst}/train_gts")
     train_txt = ""
 
+    cnt = 1
     for i in train:
         image = images[i]
         # print(image)
-        # shutil.copyfile(f"{image}", f"{dst}/train/img/{i}.jpg")
-        shutil.copyfile(f"{image}", f"{dst}/train_images/{i}.jpg")
+        # shutil.copyfile(f"{image}", f"{dst}/train_images/{i}.jpg")
         # with open(f"{dst}/train/gt/{i}.txt", "w+") as f: 
         # print(image.split("/")[-1])
 
         try:
             txt = convert2gt(labellings[image.split("/")[-1]])
             if txt != False: 
-                with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f:
+                # with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f:
+                with open(f"{dst}/annotations/training/gt_img_{cnt}.txt", "w+") as f:
                     f.write(txt)
-                train_txt += f"{i}\n"
+                train_txt += f"{cnt}\n"
+                shutil.copyfile(f"{image}", f"{dst}/imgs/training/img_{cnt}.jpg")
+                cnt +=1
+
             # try: f.write(convert2gt(labellings[image.split("/")[-1]]))
         except: pass
 
         # train_txt += f"{dst}/train/img/{i}.jpg\t{dst}/train/gt/{i}.txt\n"
         # train_txt += f"{i}.jpg\tgt_{i}.txt\n"
 
-    with open(f"{dst}/train_list.txt", "w+") as f: f.write(train_txt)
+    # with open(f"{dst}/train_list.txt", "w+") as f: f.write(train_txt)
 
     if not os.path.exists(dst): os.mkdir(dst)
+    if not os.path.exists(f"{dst}/imgs/test"): os.mkdir(f"{dst}/imgs/test")
+    if not os.path.exists(f"{dst}/annotations/annotations"): os.mkdir(f"{dst}/annotations/test")
     # if not os.path.exists(f"{dst}/test"): os.mkdir(f"{dst}/test")
-    # if not os.path.exists(f"{dst}/test/img"): os.mkdir(f"{dst}/test/img")
-    if not os.path.exists(f"{dst}/test_images"): os.mkdir(f"{dst}/test_images")
-    # if not os.path.exists(f"{dst}/test/gt"): os.mkdir(f"{dst}/test/gt")
-    if not os.path.exists(f"{dst}/test_gts"): os.mkdir(f"{dst}/test_gts")
+    # if not os.path.exists(f"{dst}/test_images"): os.mkdir(f"{dst}/test_images")
+    # if not os.path.exists(f"{dst}/test_gts"): os.mkdir(f"{dst}/test_gts")
 
     test_txt = ""
-
+    cnt = 1
     for i in test:
         image = images[i]
         # print(image)
         # shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
-        shutil.copyfile(f"{image}", f"{dst}/test_images/{i}.jpg")
         # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
         try: 
             txt = convert2gt(labellings[image.split("/")[-1]])
             if txt != False:
-                with open(f"{dst}/test_gts/gt_{i}.txt", "w+") as f: 
+                with open(f"{dst}/annotations/test/gt_img_{cnt}.txt", "w+") as f: 
                     f.write(txt)
-                test_txt += f"{i}\n"
+                test_txt += f"{cnt}\n"
+                shutil.copyfile(f"{image}", f"{dst}/imgs/test/img_{cnt}.jpg")
+                cnt +=1
+            
         except: pass
         # test_txt += f"{dst}/test/img/{i}.jpg\t{dst}/test/gt/{i}.txt\n"
 
-    with open(f"{dst}/test_list.txt", "w+") as f: f.write(test_txt)
+    # with open(f"{dst}/test_list.txt", "w+") as f: f.write(test_txt)
     print(f"Train Size:{len(train)} | Test Size: {len(test)}")
