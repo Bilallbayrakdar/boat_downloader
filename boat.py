@@ -185,7 +185,7 @@ if __name__ == "__main__":
         # print(image.split("/")[-1])
 
         try:
-            txt = convert2gt(labellings[image.split("/")[-1]])
+            txt = convert2gt(labellings[image.split("/")[-1]]).replace('\n\n', '\n')
             if txt != False: 
                 # with open(f"{dst}/train_gts/gt_{i}.txt", "w+") as f:
                 with open(f"{dst}/annotations/training/gt_img_{cnt}.txt", "w+") as f:
@@ -217,7 +217,7 @@ if __name__ == "__main__":
         # shutil.copyfile(f"{image}", f"{dst}/test/img/{i}.jpg")
         # with open(f"{dst}/test/gt/{i}.txt", "w+") as f: 
         try: 
-            txt = convert2gt(labellings[image.split("/")[-1]])
+            txt = convert2gt(labellings[image.split("/")[-1]]).replace('\n\n', '\n')
             if txt != False:
                 with open(f"{dst}/annotations/test/gt_img_{cnt}.txt", "w+") as f: 
                     f.write(txt)
